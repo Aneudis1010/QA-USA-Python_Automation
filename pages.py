@@ -1,8 +1,9 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import helpers
 from selenium.webdriver.common.keys import Keys
+import helpers
+
 
 class UrbanRoutesPage:
 
@@ -29,7 +30,9 @@ class UrbanRoutesPage:
     def click_call_taxi_button(self):
 
         call_button = self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Call')]"))
+            EC.element_to_be_clickable(
+                (By.XPATH, "//button[contains(text(),'Call')]")
+            )
         )
         call_button.click()
 
@@ -42,12 +45,12 @@ class UrbanRoutesPage:
                 (By.XPATH, "//div[contains(@class,'tcard')][.//div[text()='Supportive']]")
             )
         )
-
         supportive_plan.click()
 
     # ---------- PHONE ----------
 
     def enter_phone_number(self, phone):
+
         phone_button = self.wait.until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, ".np-button"))
         )
@@ -63,7 +66,6 @@ class UrbanRoutesPage:
         )
         next_button.click()
 
-        # wait for SMS input to appear before retrieving code
         code_input = self.wait.until(
             EC.visibility_of_element_located((By.ID, "code"))
         )
@@ -88,6 +90,7 @@ class UrbanRoutesPage:
     # ---------- PAYMENT ----------
 
     def enter_card(self, card_number, card_code):
+
         payment_button = self.wait.until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, ".pp-button"))
         )
@@ -108,7 +111,6 @@ class UrbanRoutesPage:
         )
         card_code_input.send_keys(card_code)
 
-        # press TAB so validation triggers
         card_code_input.send_keys(Keys.TAB)
 
         link_button = self.wait.until(
@@ -128,7 +130,7 @@ class UrbanRoutesPage:
     # ---------- BLANKET ----------
 
     def order_blanket(self):
-        # wait until overlay animation disappears
+
         self.wait.until(
             EC.invisibility_of_element_located((By.CSS_SELECTOR, ".overlay"))
         )
@@ -152,10 +154,8 @@ class UrbanRoutesPage:
 
     # ---------- ORDER TAXI ----------
 
-    # ---------- ORDER TAXI ----------
-
     def click_order(self):
-        # wait for UI overlay animation to disappear
+
         self.wait.until(
             EC.invisibility_of_element_located((By.CSS_SELECTOR, ".overlay"))
         )
@@ -166,11 +166,18 @@ class UrbanRoutesPage:
 
         self.driver.execute_script("arguments[0].click();", order_button)
 
+    # ---------- CAR SEARCH ----------
+
     def wait_for_car(self):
+
         car_search = self.wait.until(
-            EC.visibility_of_element_located((By.CSS_SELECTOR, ".order-header-title"))
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, ".order-header-title")
+            )
         )
+
         return car_search.is_displayed()
+
     # ---------- ORDER HEADER ----------
 
     def get_order_header(self):

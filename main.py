@@ -1,4 +1,3 @@
-import pytest
 from selenium import webdriver
 import data
 from pages import UrbanRoutesPage
@@ -6,8 +5,8 @@ from pages import UrbanRoutesPage
 
 class TestUrbanRoutes:
 
-    @pytest.fixture(autouse=True)
-    def setup(self):
+    @classmethod
+    def setup_class(cls):
         options = webdriver.ChromeOptions()
         options.add_argument("--start-maximized")
 
@@ -16,11 +15,11 @@ class TestUrbanRoutes:
             {"performance": "ALL"}
         )
 
-        self.driver = webdriver.Chrome(options=options)
+        cls.driver = webdriver.Chrome(options=options)
 
-        yield
-
-        self.driver.quit()
+    @classmethod
+    def teardown_class(cls):
+        cls.driver.quit()
 
     def test_set_route(self):
 
@@ -41,6 +40,8 @@ class TestUrbanRoutes:
         page.set_addresses(data.ADDRESS_FROM, data.ADDRESS_TO)
         page.click_call_taxi_button()
         page.select_supportive_plan()
+
+        assert "Supportive" in self.driver.page_source
 
     def test_fill_phone_number(self):
 
@@ -69,6 +70,8 @@ class TestUrbanRoutes:
         page.enter_phone_number(data.PHONE_NUMBER)
         page.enter_card(data.CARD_NUMBER, data.CARD_CODE)
 
+        assert data.CARD_NUMBER[-4:] in self.driver.page_source
+
     def test_comment_for_driver(self):
 
         self.driver.get(data.URBAN_ROUTES_URL)
@@ -80,6 +83,8 @@ class TestUrbanRoutes:
         page.select_supportive_plan()
 
         page.add_comment(data.MESSAGE_FOR_DRIVER)
+
+        assert data.MESSAGE_FOR_DRIVER in self.driver.page_source
 
     def test_order_blanket(self):
 
@@ -93,6 +98,8 @@ class TestUrbanRoutes:
 
         page.order_blanket()
 
+        assert "Blanket" in self.driver.page_source
+
     def test_order_2_ice_creams(self):
 
         self.driver.get(data.URBAN_ROUTES_URL)
@@ -105,7 +112,10 @@ class TestUrbanRoutes:
 
         page.order_ice_cream()
 
+        assert "2" in self.driver.page_source
+
     def test_car_search_model_appears(self):
+
         self.driver.get(data.URBAN_ROUTES_URL)
 
         page = UrbanRoutesPage(self.driver)
@@ -118,6 +128,6 @@ class TestUrbanRoutes:
         page.enter_card(data.CARD_NUMBER, data.CARD_CODE)
 
         page.order_blanket()
+        page.click_order()
 
-        page.click_order()  # correct action
-        assert page.wait_for_car()  # verify search modal
+        assert page.wait_for_car()
