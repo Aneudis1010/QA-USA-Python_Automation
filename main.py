@@ -110,9 +110,10 @@ class TestUrbanRoutes:
         page.click_call_taxi_button()
         page.select_supportive_plan()
 
-        page.order_ice_cream()
+        amount = 2
+        page.order_ice_cream(amount)
 
-        assert "2" in self.driver.page_source
+        assert str(amount) in self.driver.page_source
 
     def test_car_search_model_appears(self):
 
