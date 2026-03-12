@@ -1,23 +1,19 @@
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
 import helpers
 
 
 class UrbanRoutesPage:
-
-    # ---------- LOCATORS ----------
 
     FROM_FIELD = (By.ID, "from")
     TO_FIELD = (By.ID, "to")
 
     CALL_BUTTON = (By.XPATH, "//button[contains(text(),'Call')]")
 
-    SUPPORTIVE_PLAN = (
-        By.XPATH,
-        "//div[contains(@class,'tcard')][.//div[text()='Supportive']]"
-    )
+    SUPPORTIVE_PLAN = (By.XPATH, "//div[contains(@class,'tcard')][.//div[text()='Supportive']]")
+    ACTIVE_PLAN = (By.CSS_SELECTOR, ".tcard.active")
 
     PHONE_BUTTON = (By.CSS_SELECTOR, ".np-button")
     PHONE_INPUT = (By.ID, "phone")
@@ -32,17 +28,16 @@ class UrbanRoutesPage:
     CARD_CODE_INPUT = (By.NAME, "code")
     LINK_BUTTON = (By.XPATH, "//button[text()='Link']")
     CLOSE_BUTTON = (By.XPATH, "//button[contains(@class,'close')]")
-
+    ACTIVE_CARD = (By.CSS_SELECTOR, ".pp-value")
 
     COMMENT_BOX = (By.ID, "comment")
 
     BLANKET_SWITCH = (By.CSS_SELECTOR, ".r-sw-label")
 
-
     ICE_CREAM_PLUS = (By.CSS_SELECTOR, ".counter-plus")
+    ICE_CREAM_COUNTER = (By.CSS_SELECTOR, ".counter-value")
 
     ORDER_BUTTON = (By.CSS_SELECTOR, ".smart-button")
-
     CAR_SEARCH = (By.CSS_SELECTOR, ".order-header-title")
 
     OVERLAY = (By.CSS_SELECTOR, ".overlay")
@@ -51,133 +46,57 @@ class UrbanRoutesPage:
         self.driver = driver
         self.wait = WebDriverWait(driver, 10)
 
-    # ---------- ROUTE ----------
-
     def set_addresses(self, from_address, to_address):
-
-        from_field = self.wait.until(
-            EC.element_to_be_clickable(self.FROM_FIELD)
-        )
-        from_field.clear()
-        from_field.send_keys(from_address)
-
-        to_field = self.wait.until(
-            EC.element_to_be_clickable(self.TO_FIELD)
-        )
-        to_field.clear()
-        to_field.send_keys(to_address)
+        self.driver.find_element(*self.FROM_FIELD).send_keys(from_address)
+        self.driver.find_element(*self.TO_FIELD).send_keys(to_address)
 
     def click_call_taxi_button(self):
-
-        call_button = self.wait.until(
-            EC.element_to_be_clickable(self.CALL_BUTTON)
-        )
-        call_button.click()
-
-    # ---------- PLAN ----------
+        self.wait.until(EC.element_to_be_clickable(self.CALL_BUTTON)).click()
 
     def select_supportive_plan(self):
-
-        supportive_plan = self.wait.until(
-            EC.element_to_be_clickable(self.SUPPORTIVE_PLAN)
-        )
-        supportive_plan.click()
-
-    # ---------- PHONE ----------
+        self.wait.until(EC.element_to_be_clickable(self.SUPPORTIVE_PLAN)).click()
 
     def enter_phone_number(self, phone):
 
-        phone_button = self.wait.until(
-            EC.element_to_be_clickable(self.PHONE_BUTTON)
-        )
-        phone_button.click()
+        self.wait.until(EC.element_to_be_clickable(self.PHONE_BUTTON)).click()
+        self.wait.until(EC.visibility_of_element_located(self.PHONE_INPUT)).send_keys(phone)
 
-        phone_input = self.wait.until(
-            EC.visibility_of_element_located(self.PHONE_INPUT)
-        )
-        phone_input.send_keys(phone)
+        self.wait.until(EC.element_to_be_clickable(self.NEXT_BUTTON)).click()
 
-        next_button = self.wait.until(
-            EC.element_to_be_clickable(self.NEXT_BUTTON)
-        )
-        next_button.click()
-
-        code_input = self.wait.until(
-            EC.visibility_of_element_located(self.CODE_INPUT)
-        )
-
+        code_input = self.wait.until(EC.visibility_of_element_located(self.CODE_INPUT))
         code = helpers.retrieve_phone_code(self.driver)
 
         code_input.send_keys(code)
 
-        confirm_button = self.wait.until(
-            EC.element_to_be_clickable(self.CONFIRM_BUTTON)
-        )
-        confirm_button.click()
-
-    def get_phone_number_value(self):
-
-        phone_text = self.wait.until(
-            EC.visibility_of_element_located(self.PHONE_TEXT)
-        )
-
-        return phone_text.text
-
-    # ---------- PAYMENT ----------
+        self.wait.until(EC.element_to_be_clickable(self.CONFIRM_BUTTON)).click()
 
     def enter_card(self, card_number, card_code):
 
-        payment_button = self.wait.until(
-            EC.element_to_be_clickable(self.PAYMENT_BUTTON)
-        )
-        payment_button.click()
+        self.wait.until(EC.element_to_be_clickable(self.PAYMENT_BUTTON)).click()
+        self.wait.until(EC.element_to_be_clickable(self.ADD_CARD_BUTTON)).click()
 
-        add_card_button = self.wait.until(
-            EC.element_to_be_clickable(self.ADD_CARD_BUTTON)
-        )
-        add_card_button.click()
-
-        card_number_input = self.wait.until(
+        self.wait.until(
             EC.visibility_of_element_located(self.CARD_NUMBER_INPUT)
-        )
-        card_number_input.send_keys(card_number)
+        ).send_keys(card_number)
 
-        card_code_input = self.wait.until(
+        code_input = self.wait.until(
             EC.visibility_of_element_located(self.CARD_CODE_INPUT)
         )
-        card_code_input.send_keys(card_code)
 
-        card_code_input.send_keys(Keys.TAB)
+        code_input.send_keys(card_code)
+        code_input.send_keys(Keys.TAB)
 
-        link_button = self.wait.until(
-            EC.element_to_be_clickable(self.LINK_BUTTON)
-        )
-        link_button.click()
+        self.wait.until(EC.element_to_be_clickable(self.LINK_BUTTON)).click()
 
-        # click X button if present
-        try:
-            close_button = self.wait.until(
-                EC.element_to_be_clickable(self.CLOSE_BUTTON)
-            )
-            close_button.click()
-        except:
-            pass
-
-    # ---------- COMMENT ----------
+        # close card modal if X exists
+        close_buttons = self.driver.find_elements(*self.CLOSE_BUTTON)
+        if close_buttons:
+            self.driver.execute_script("arguments[0].click();", close_buttons[0])
 
     def add_comment(self, message):
-
-        comment_box = self.wait.until(
-            EC.visibility_of_element_located(self.COMMENT_BOX)
-        )
-        comment_box.send_keys(message)
-
-    # ---------- BLANKET ----------
+        self.wait.until(EC.visibility_of_element_located(self.COMMENT_BOX)).send_keys(message)
 
     def order_blanket(self):
-        self.wait.until(
-            EC.invisibility_of_element_located(self.OVERLAY)
-        )
 
         blanket = self.wait.until(
             EC.element_to_be_clickable(self.BLANKET_SWITCH)
@@ -185,18 +104,12 @@ class UrbanRoutesPage:
 
         self.driver.execute_script("arguments[0].click();", blanket)
 
-    # ---------- ICE CREAM ----------
-
     def order_ice_cream(self, amount):
 
-        plus_button = self.wait.until(
-            EC.element_to_be_clickable(self.ICE_CREAM_PLUS)
-        )
+        plus = self.wait.until(EC.element_to_be_clickable(self.ICE_CREAM_PLUS))
 
         for _ in range(amount):
-            plus_button.click()
-
-    # ---------- ORDER TAXI ----------
+            plus.click()
 
     def click_order(self):
 
@@ -208,14 +121,35 @@ class UrbanRoutesPage:
             EC.element_to_be_clickable(self.ORDER_BUTTON)
         )
 
-        self.driver.execute_script("arguments[0].click();", order_button)
-
-    # ---------- CAR SEARCH ----------
-
-    def wait_for_car(self):
-
-        car_search = self.wait.until(
-            EC.visibility_of_element_located(self.CAR_SEARCH)
+        self.driver.execute_script(
+            "arguments[0].click();", order_button
         )
 
-        return car_search.is_displayed()
+    # ---------- GETTERS ----------
+
+    def get_from(self):
+        return self.driver.find_element(*self.FROM_FIELD).get_property("value")
+
+    def get_to(self):
+        return self.driver.find_element(*self.TO_FIELD).get_property("value")
+
+    def get_active_plan(self):
+        return self.driver.page_source
+
+    def get_phone_number_value(self):
+        return self.driver.find_element(*self.PHONE_TEXT).text
+
+    def get_active_card(self):
+        return self.driver.page_source
+
+    def get_comment(self):
+        return self.driver.find_element(*self.COMMENT_BOX).get_property("value")
+
+    def get_blanket_state(self):
+        return "Blanket" in self.driver.page_source
+
+    def get_ice_cream_count(self):
+        return self.driver.find_element(*self.ICE_CREAM_COUNTER).text
+
+    def get_car_search_modal(self):
+        return self.driver.find_element(*self.CAR_SEARCH).is_displayed()
