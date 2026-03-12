@@ -33,6 +33,7 @@ class UrbanRoutesPage:
     COMMENT_BOX = (By.ID, "comment")
 
     BLANKET_SWITCH = (By.CSS_SELECTOR, ".r-sw-label")
+    BLANKET_CHECKBOX = (By.CSS_SELECTOR, "input[type='checkbox']")
 
     ICE_CREAM_PLUS = (By.CSS_SELECTOR, ".counter-plus")
     ICE_CREAM_COUNTER = (By.CSS_SELECTOR, ".counter-value")
@@ -88,7 +89,6 @@ class UrbanRoutesPage:
 
         self.wait.until(EC.element_to_be_clickable(self.LINK_BUTTON)).click()
 
-        # close card modal if X exists
         close_buttons = self.driver.find_elements(*self.CLOSE_BUTTON)
         if close_buttons:
             self.driver.execute_script("arguments[0].click();", close_buttons[0])
@@ -134,19 +134,23 @@ class UrbanRoutesPage:
         return self.driver.find_element(*self.TO_FIELD).get_property("value")
 
     def get_active_plan(self):
-        return self.driver.page_source
+        return self.driver.find_element(*self.ACTIVE_PLAN).text
 
     def get_phone_number_value(self):
         return self.driver.find_element(*self.PHONE_TEXT).text
 
     def get_active_card(self):
-        return self.driver.page_source
+        return self.driver.find_element(*self.ACTIVE_CARD).text
 
     def get_comment(self):
         return self.driver.find_element(*self.COMMENT_BOX).get_property("value")
 
+    # ✔ Correct slider state validation
     def get_blanket_state(self):
-        return "Blanket" in self.driver.page_source
+        self.wait.until(
+            EC.presence_of_element_located(self.BLANKET_CHECKBOX)
+        )
+        return self.driver.find_element(*self.BLANKET_CHECKBOX).is_selected()
 
     def get_ice_cream_count(self):
         return self.driver.find_element(*self.ICE_CREAM_COUNTER).text
