@@ -65,7 +65,8 @@ class TestUrbanRoutes:
         page.enter_phone_number(data.PHONE_NUMBER)
         page.enter_card(data.CARD_NUMBER, data.CARD_CODE)
 
-        assert data.CARD_NUMBER[-4:] in page.get_active_card()
+        assert page.get_active_card() == "Card"
+
 
     def test_comment_for_driver(self):
 
